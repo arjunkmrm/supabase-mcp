@@ -1,0 +1,43 @@
+# Smithery configuration file: https://smithery.ai/docs/config#smitheryyaml
+
+startCommand:
+  type: stdio
+  configSchema:
+    # JSON Schema defining the configuration options for the MCP.
+    type: object
+    required:
+      - supabaseUrl
+      - supabaseKey
+      - supabaseAccessToken
+    properties:
+      supabaseUrl:
+        type: string
+        description: The URL of your Supabase project.
+      supabaseKey:
+        type: string
+        description: The service role key for Supabase operations.
+      supabaseAccessToken:
+        type: string
+        description: The access token for Supabase management operations.
+      port:
+        type: number
+        default: 3000
+        description: Port on which the server should run.
+  commandFunction:
+    # A JS function that produces the CLI command based on the given config to start the MCP on stdio.
+    |-
+    (config) => ({
+      command: 'node',
+      args: ['build/index.js'],
+      env: {
+        SUPABASE_URL: config.supabaseUrl,
+        SUPABASE_KEY: config.supabaseKey,
+        SUPABASE_ACCESS_TOKEN: config.supabaseAccessToken,
+        PORT: config.port ? String(config.port) : '3000'
+      }
+    })
+  exampleConfig:
+    supabaseUrl: https://your-project.supabase.co
+    supabaseKey: your_service_role_key_here
+    supabaseAccessToken: your_access_token_here
+    port: 3000
