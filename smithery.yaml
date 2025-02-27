@@ -19,10 +19,6 @@ startCommand:
       supabaseAccessToken:
         type: string
         description: The access token for Supabase management operations.
-      port:
-        type: number
-        default: 3000
-        description: Port on which the server should run.
   commandFunction:
     # A JS function that produces the CLI command based on the given config to start the MCP on stdio.
     |-
@@ -32,12 +28,10 @@ startCommand:
       env: {
         SUPABASE_URL: config.supabaseUrl,
         SUPABASE_KEY: config.supabaseKey,
-        SUPABASE_ACCESS_TOKEN: config.supabaseAccessToken,
-        PORT: config.port ? String(config.port) : '3000'
+        SUPABASE_ACCESS_TOKEN: config.supabaseAccessToken
       }
     })
   exampleConfig:
     supabaseUrl: https://your-project.supabase.co
     supabaseKey: your_service_role_key_here
     supabaseAccessToken: your_access_token_here
-    port: 3000

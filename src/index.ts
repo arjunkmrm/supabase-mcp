@@ -1,9 +1,6 @@
 #!/usr/bin/env node
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
-import express, { Request, Response } from 'express';
-import cors from 'cors';
 import {
   CallToolRequestSchema,
   ErrorCode,
@@ -11,7 +8,7 @@ import {
   McpError,
 } from '@modelcontextprotocol/sdk/types.js';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import type { SupabaseQueryResult, SupabaseFilterBuilder, AdminAuthOperations } from './types/supabase.js';
+import type { SupabaseFilterBuilder, AdminAuthOperations } from './types/supabase.js';
 
 // Ensure environment variables are defined
 const SUPABASE_URL = process.env.SUPABASE_URL ?? '';
@@ -912,64 +909,10 @@ class SupabaseServer {
     };
   }
 
-  public async run(transport: 'stdio' | 'sse' = 'stdio', port?: number): Promise<void> {
-    if (transport === 'sse') {
-      const app = express();
-      app.use(cors());
-      
-      // Create a promise that resolves when SSE connection is established
-      const sseConnectionPromise = new Promise<SSEServerTransport>((resolve, reject) => {
-        let timeoutId: NodeJS.Timeout;
-
-        // Set a timeout for SSE connection
-        timeoutId = setTimeout(() => {
-          reject(new Error('SSE connection timeout after 30 seconds'));
-        }, 30000);
-
-        app.get('/sse', async (req: Request, res: Response) => {
-          res.setHeader('Content-Type', 'text/event-stream');
-          res.setHeader('Cache-Control', 'no-cache');
-          res.setHeader('Connection', 'keep-alive');
-
-          try {
-            const transport = new SSEServerTransport('/message', res);
-            await transport.start();
-            clearTimeout(timeoutId);
-            resolve(transport);
-          } catch (error) {
-            clearTimeout(timeoutId);
-            reject(error);
-          }
-        });
-      });
-
-      // Handle incoming messages
-      app.post('/message', async (req: Request, res: Response) => {
-        try {
-          const transport = await sseConnectionPromise;
-          await transport.handlePostMessage(req, res);
-        } catch (error) {
-          res.status(500).json({ error: 'Failed to handle message' });
-        }
-      });
-
-      // Start HTTP server and wait for SSE connection
-      const httpServer = app.listen(port || 8765, () => {
-        console.error(`Supabase MCP server running on SSE at port ${port || 8765}`);
-      });
-
-      try {
-        const transport = await sseConnectionPromise;
-        await this.server.connect(transport);
-      } catch (error) {
-        httpServer.close();
-        throw error;
-      }
-    } else {
-      const transport = new StdioServerTransport();
-      await this.server.connect(transport);
-      console.error('Supabase MCP server running on stdio');
-    }
+  public async run(): Promise<void> {
+    const transport = new StdioServerTransport();
+    await this.server.connect(transport);
+    console.error('Supabase MCP server running on stdio');
   }
 }
 
@@ -992,14 +935,11 @@ node "${process.argv[1]}" "$@"
   console.log(`Created wrapper script at ${wrapperPath}`);
 };
 
-// Parse command line arguments
+// Simplify command line argument handling
 const args = process.argv.slice(2);
 if (args.includes('--create-wrapper')) {
   createWrapperScript();
 } else {
-  const transportType = args[0] || 'stdio';
-  const port = args[1] ? parseInt(args[1]) : undefined;
-  
   const server = new SupabaseServer();
-  server.run(transportType as 'stdio' | 'sse', port).catch(console.error);
+  server.run().catch(console.error);
 }
