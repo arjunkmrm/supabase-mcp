@@ -1,9 +1,6 @@
 # Supabase MCP Server
 
-[![smithery badge](https://smithery.ai/badge/supabase-server)](https://smithery.ai/server/supabase-server)
 A Model Context Protocol (MCP) server that provides comprehensive tools for interacting with Supabase databases, storage, and edge functions. This server enables seamless integration between Supabase services and MCP-compatible applications.
-
-<a href="https://glama.ai/mcp/servers/vwi6nt8i80"><img width="380" height="200" src="https://glama.ai/mcp/servers/vwi6nt8i80/badge" alt="supabase-mcp MCP server" /></a>
 
 ## Overview
 
@@ -47,49 +44,6 @@ supabase-server/
   - Service Role Key (for admin operations)
   - Access Token (for management operations)
 - MCP-compatible client
-
-## Installation
-
-### Installing via Smithery
-
-To install Supabase Server for Claude Desktop automatically via [Smithery](https://smithery.ai/server/supabase-server):
-
-```bash
-npx -y @smithery/cli install supabase-server --client claude
-```
-
-1. Clone the repository:
-```bash
-git clone https://github.com/DynamicEndpoints/supabase-mcp.git
-cd supabase-mcp
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Create environment configuration:
-```bash
-cp .env.example .env
-```
-
-4. Configure environment variables:
-```bash
-SUPABASE_URL=your_project_url_here
-SUPABASE_KEY=your_service_role_key_here
-SUPABASE_ACCESS_TOKEN=your_access_token_here  # Required for management operations
-```
-
-5. Create server configuration:
-```bash
-cp config.json.example config.json
-```
-
-6. Build the server:
-```bash
-npm run build
-```
 
 ## Configuration
 
@@ -470,49 +424,6 @@ The server provides detailed error messages for common scenarios:
 - Network errors
 - Database constraints
 
-Errors are returned in a standardized format:
-
-```typescript
-{
-  code: ErrorCode;
-  message: string;
-  details?: any;
-}
-```
-
-## Development
-
-### Running Tests
-```bash
-npm test
-```
-
-### Building
-```bash
-npm run build
-```
-
-### Linting
-```bash
-npm run lint
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
 ## License
 
 MIT License - see LICENSE for details
-
-## Support
-
-For support, please:
-
-1. Check the [issues](https://github.com/DynamicEndpoints/supabase-mcp/issues) for existing problems/solutions
-2. Create a new issue with detailed reproduction steps
-3. Include relevant error messages and environment details
